@@ -9,6 +9,7 @@ using AutoMapper;
 using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Transflo_Task.Data;
@@ -114,6 +115,14 @@ namespace Transflo_Task.Controllers
                     return BadRequest();
                 }
 
+                if (await _context.GetAsync(u => u.Email.ToLower() == updateDTO.Email.ToLower()&&u.Id!=id) != null )
+                {
+                    ModelState.AddModelError("ErrorMessages", "email of driver already Exists!");
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages = new List<string> { "email of driver already Exists!" };
+                    return _response;
+                }
+
                 Driver model = _mapper.Map<Driver>(updateDTO);
 
                 await _context.UpdateAsync(model);
@@ -144,7 +153,9 @@ namespace Transflo_Task.Controllers
                 if (await _context.GetAsync(u => u.Email.ToLower() == createDTO.Email.ToLower()) != null)
                 {
                     ModelState.AddModelError("ErrorMessages", "email of driver already Exists!");
-                    return BadRequest(ModelState);
+                    _response.IsSuccess=false;
+                    _response.ErrorMessages= new List<string> { "email of driver already Exists!" };
+                    return _response;
                 }
 
                 if (createDTO == null)
