@@ -24,6 +24,18 @@ builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 
+// add policy
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") // or AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin();
+    });
+});
+
 var app = builder.Build();
 
 
@@ -34,7 +46,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
